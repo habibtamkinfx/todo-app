@@ -3,14 +3,14 @@ const dateEl = document.getElementById('date');
 const todoInputEl = document.getElementById('todo-task');
 const addBtnEl = document.getElementById('add-btn');
 const filtersEl = document.querySelectorAll('.filter');
-const todoListEl = document.getElementById('todo-list');
+const todoListEl = document.getElementById('todos-list');
 const emptyStateEl = document.querySelector('.empty-state');
 const itemsLeftEl = document.getElementById('items-left');
 const clearCompletedBtnEl = document.getElementById('clear-completed-btn');
 
 // Initialize an array to store tasks
 let todos = JSON.parse(localStorage.getItem('todos')) || [];
-const currentFilter = 'all';
+let currentFilter = 'all';
 
 // Display current date
 const options = { weekday: 'long', month: 'long', day: 'numeric' };
@@ -43,7 +43,69 @@ function addTodo() {
   };
   todos.push(newTodo);
 
-  // saveTodos();
-  // renderTodos();
+  saveTodos();
+  renderTodos();
   todoInputEl.value = '';
 }
+
+// Save todos to LocalStorage
+function saveTodos() {
+  localStorage.setItem('todos', JSON.stringify(todos));
+}
+
+function renderTodos() {
+  // Clear existing list
+  todoListEl.innerHTML = '';
+
+  todos.forEach((todo) => {
+ 
+    const todoItemEl = document.createElement('li');
+    todoItemEl.classList.add('todo-item');
+
+    const labelEl = document.createElement('label');
+    labelEl.classList.add('checkbox-container');
+
+    const checkboxEl = document.createElement('input');
+    checkboxEl.type = 'checkbox';
+    checkboxEl.classList.add('todo-checkbox');
+    checkboxEl.checked = todo.completed;
+    const checkmarkEl = document.createElement('span');
+    checkmarkEl.classList.add('checkmark');
+
+    const textEl = document.createElement('span');
+    textEl.classList.add('todo-item-text');
+    textEl.textContent = todo.text;
+
+    const deleteBtnEl = document.createElement('button');
+    deleteBtnEl.classList.add('delete-btn');
+    deleteBtnEl.innerHTML = '<i class="fas fa-trash"></i>';
+    deleteBtnEl.addEventListener('click', () => {
+      removeItem(todo.id);
+    });
+    checkboxEl.addEventListener('change', () => {
+      todo.completed = checkboxEl.checked;
+      saveTodos();
+      renderTodos();
+    });
+    labelEl.appendChild(checkboxEl);
+    labelEl.appendChild(checkmarkEl);
+    todoItemEl.appendChild(labelEl);
+    todoItemEl.appendChild(textEl);
+    todoItemEl.appendChild(deleteBtnEl);
+    todoListEl.appendChild(todoItemEl);
+
+    if (todo.completed) {
+      todoItemEl.classList.add('completed');
+    }
+  });
+}
+
+function removeItem(id) {
+  todos = todos.filter((todo) => todo.id !== id);
+  saveTodos();
+  renderTodos();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  renderTodos();
+});
