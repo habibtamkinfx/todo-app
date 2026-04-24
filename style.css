@@ -48,6 +48,7 @@ header h1 {
 header p {
   font-size: 0.9rem;
   opacity: 0.8;
+  margin-left: 2.2rem;
 }
 
 .input-container {
