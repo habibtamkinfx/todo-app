@@ -58,7 +58,6 @@ function renderTodos() {
   todoListEl.innerHTML = '';
 
   todos.forEach((todo) => {
- 
     const todoItemEl = document.createElement('li');
     todoItemEl.classList.add('todo-item');
 
@@ -98,6 +97,15 @@ function renderTodos() {
       todoItemEl.classList.add('completed');
     }
   });
+
+  if (todos.length === 0) {
+    emptyStateEl.classList.remove('hidden');
+  } else {
+    emptyStateEl.classList.add('hidden');
+  }
+
+  const itemsLeft = todos.filter((todo) => !todo.completed).length;
+  itemsLeftEl.textContent = `${itemsLeft} item${itemsLeft !== 1 ? 's' : ''} left`;
 }
 
 function removeItem(id) {
