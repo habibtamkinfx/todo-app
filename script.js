@@ -57,7 +57,17 @@ function renderTodos() {
   // Clear existing list
   todoListEl.innerHTML = '';
 
-  todos.forEach((todo) => {
+  const filteredTodos = todos.filter((todo) => {
+    if (currentFilter === 'active') {
+      return !todo.completed;
+    } else if (currentFilter === 'completed') {
+      return todo.completed;
+    } else {
+      return true;
+    }
+  });
+
+  filteredTodos.forEach((todo) => {
     const todoItemEl = document.createElement('li');
     todoItemEl.classList.add('todo-item');
 
@@ -98,14 +108,23 @@ function renderTodos() {
     }
   });
 
-  if (todos.length === 0) {
+  if (filteredTodos.length === 0) {
     emptyStateEl.classList.remove('hidden');
   } else {
     emptyStateEl.classList.add('hidden');
   }
 
-  const itemsLeft = todos.filter((todo) => !todo.completed).length;
+  const itemsLeft = filteredTodos.filter((todo) => !todo.completed).length;
   itemsLeftEl.textContent = `${itemsLeft} item${itemsLeft !== 1 ? 's' : ''} left`;
+}
+
+function filteredFilter() {
+  filtersEl.forEach((filter) => {
+    filter.addEventListener('click', (e) => {
+      currentFilter = e.target.dataset.filter;
+      renderTodos();
+    });
+  });
 }
 
 function removeItem(id) {
@@ -116,4 +135,5 @@ function removeItem(id) {
 
 window.addEventListener('DOMContentLoaded', () => {
   renderTodos();
+  filteredFilter();
 });
