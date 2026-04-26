@@ -6,7 +6,7 @@ const filtersEl = document.querySelectorAll('.filter');
 const todoListEl = document.getElementById('todos-list');
 const emptyStateEl = document.querySelector('.empty-state');
 const itemsLeftEl = document.getElementById('items-left');
-const clearCompletedBtnEl = document.getElementById('clear-completed-btn');
+const clearCompletedBtnEl = document.getElementById('clear-completed');
 
 // Initialize an array to store tasks
 let todos = JSON.parse(localStorage.getItem('todos')) || [];
@@ -57,15 +57,7 @@ function renderTodos() {
   // Clear existing list
   todoListEl.innerHTML = '';
 
-  const filteredTodos = todos.filter((todo) => {
-    if (currentFilter === 'active') {
-      return !todo.completed;
-    } else if (currentFilter === 'completed') {
-      return todo.completed;
-    } else {
-      return true;
-    }
-  });
+  const filteredTodos = getFilteredTodos();
 
   filteredTodos.forEach((todo) => {
     const todoItemEl = document.createElement('li');
@@ -113,25 +105,53 @@ function renderTodos() {
   } else {
     emptyStateEl.classList.add('hidden');
   }
-
-  const itemsLeft = filteredTodos.filter((todo) => !todo.completed).length;
-  itemsLeftEl.textContent = `${itemsLeft} item${itemsLeft !== 1 ? 's' : ''} left`;
+  updateItemsLeft();
 }
 
+// Filter tasks based on selected filter
 function filteredFilter() {
   filtersEl.forEach((filter) => {
     filter.addEventListener('click', (e) => {
-      currentFilter = e.target.dataset.filter;
+      currentFilter = e.currentTarget.dataset.filter;
       renderTodos();
     });
   });
 }
 
+// Get filtered todos based on current filter
+function getFilteredTodos() {
+  const filteredTodos = todos.filter((todo) => {
+    switch (currentFilter) {
+      case 'active':
+        return !todo.completed;
+      case 'completed':
+        return todo.completed;
+      default:
+        return true;
+    }
+  });
+  return filteredTodos;
+}
+
+// Update the count of active tasks
+function updateItemsLeft() {
+  const activeTodos = todos.filter((todo) => !todo.completed);
+  itemsLeftEl.textContent = `${activeTodos.length} item${activeTodos.length !== 1 ? 's' : ''} left`;
+}
+
+// Remove a todo item
 function removeItem(id) {
   todos = todos.filter((todo) => todo.id !== id);
   saveTodos();
   renderTodos();
 }
+
+// Clear all completed tasks
+clearCompletedBtnEl.addEventListener('click', () => {
+  todos = todos.filter((todo) => !todo.completed);
+  saveTodos();
+  renderTodos();
+});
 
 window.addEventListener('DOMContentLoaded', () => {
   renderTodos();
