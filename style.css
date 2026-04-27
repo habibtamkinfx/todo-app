@@ -210,6 +210,16 @@ header p {
 .delete-btn:hover {
   color: var(--danger);
 }
+.edit-input {
+  flex: 1;
+  font-size: 1rem;
+  color: var(--dark);
+  padding: 10px 15px;
+  border: 1px solid #dee2e5;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  margin-right: 15px;
+}
 
 footer {
   padding: 1rem 1.5rem;

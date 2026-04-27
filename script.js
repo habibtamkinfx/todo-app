@@ -12,11 +12,6 @@ const clearCompletedBtnEl = document.getElementById('clear-completed');
 let todos = JSON.parse(localStorage.getItem('todos')) || [];
 let currentFilter = 'all';
 
-// Display current date
-const options = { weekday: 'long', month: 'long', day: 'numeric' };
-const today = new Date();
-dateEl.textContent = today.toLocaleDateString('en-US', options);
-
 // Event Listeners
 todoInputEl.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') {
@@ -70,12 +65,17 @@ function renderTodos() {
     checkboxEl.type = 'checkbox';
     checkboxEl.classList.add('todo-checkbox');
     checkboxEl.checked = todo.completed;
+
     const checkmarkEl = document.createElement('span');
     checkmarkEl.classList.add('checkmark');
 
     const textEl = document.createElement('span');
     textEl.classList.add('todo-item-text');
     textEl.textContent = todo.text;
+
+    textEl.addEventListener('dblclick', () => {
+      editTodo(todo, textEl);
+    });
 
     const deleteBtnEl = document.createElement('button');
     deleteBtnEl.classList.add('delete-btn');
@@ -112,6 +112,8 @@ function renderTodos() {
 function filteredFilter() {
   filtersEl.forEach((filter) => {
     filter.addEventListener('click', (e) => {
+      filtersEl.forEach((f) => f.classList.remove('active'));
+      e.currentTarget.classList.add('active');
       currentFilter = e.currentTarget.dataset.filter;
       renderTodos();
     });
@@ -153,7 +155,43 @@ clearCompletedBtnEl.addEventListener('click', () => {
   renderTodos();
 });
 
+// Display current date
+function updateDate() {
+  const options = { weekday: 'long', month: 'long', day: 'numeric' };
+  const today = new Date();
+  dateEl.textContent = today.toLocaleDateString('en-US', options);
+}
+
+// Edit a todo item
+function editTodo(todo, textEl) {
+  const editInputEl = document.createElement('input');
+  editInputEl.type = 'text';
+  editInputEl.classList.add('edit-input');
+  editInputEl.value = todo.text;
+  textEl.replaceWith(editInputEl);
+  editInputEl.focus();
+
+  const save = () => {
+    const updatedText = editInputEl.value.trim();
+    if (!updatedText) {
+      renderTodos();
+      return;
+    }
+    todo.text = updatedText;
+    saveTodos();
+    renderTodos();
+  };
+  editInputEl.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      editInputEl.blur();
+    }
+  });
+  editInputEl.addEventListener('blur', save);
+}
+
+// Initialize the app
 window.addEventListener('DOMContentLoaded', () => {
   renderTodos();
   filteredFilter();
+  updateDate();
 });
